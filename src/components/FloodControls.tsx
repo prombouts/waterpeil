@@ -1,6 +1,8 @@
 import type { FloodStatus } from './FloodLayer'
+import { translations, type Language } from '../translations'
 
 interface FloodControlsProps {
+  language: Language
   enabled: boolean
   level: number
   status: FloodStatus
@@ -13,12 +15,15 @@ const MAX_LEVEL = 10
 const STEP = 0.5
 
 export default function FloodControls({
+  language,
   enabled,
   level,
   status,
   onEnabledChange,
   onLevelChange,
 }: FloodControlsProps) {
+  const t = translations[language]
+
   return (
     <div className="flood-panel">
       <label className="flood-toggle">
@@ -27,12 +32,16 @@ export default function FloodControls({
           checked={enabled}
           onChange={(e) => onEnabledChange(e.target.checked)}
         />
-        <strong>Dijkdoorbraak-simulatie</strong>
+        <strong>{t.floodSimulation}</strong>
       </label>
       {enabled && (
         <>
           <label className="flood-level">
-            Waterpeil: <strong>{level >= 0 ? '+' : ''}{level.toFixed(1)} m NAP</strong>
+            {t.waterLevel}{' '}
+            <strong>
+              {level >= 0 ? '+' : ''}
+              {level.toFixed(1)} m NAP
+            </strong>
             <input
               type="range"
               min={MIN_LEVEL}
@@ -43,14 +52,11 @@ export default function FloodControls({
             />
           </label>
           <div className="flood-status">
-            {status === 'loading' && 'Hoogtedata laden…'}
-            {status === 'error' && 'Laden van hoogtedata mislukt.'}
-            {status === 'zoom-out' && 'Zoom verder in om de simulatie te zien.'}
+            {status === 'loading' && t.loadingElevation}
+            {status === 'error' && t.elevationError}
+            {status === 'zoom-out' && t.zoomInHint}
             {status === 'idle' && (
-              <span className="flood-hint">
-                Blauw = land onder het gekozen waterpeil (vereenvoudigd
-                &ldquo;badkuip&rdquo;-model op basis van AHN-maaiveldhoogte).
-              </span>
+              <span className="flood-hint">{t.floodHint}</span>
             )}
           </div>
         </>

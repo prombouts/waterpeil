@@ -14,6 +14,7 @@ import markerIcon from 'leaflet/dist/images/marker-icon.png'
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
 import markerShadow from 'leaflet/dist/images/marker-shadow.png'
 import { locations } from '../data/locations'
+import { translations, type Language } from '../translations'
 import FloodLayer, { type FloodStatus } from './FloodLayer'
 
 // Fix default marker icons under bundlers (Vite)
@@ -30,9 +31,6 @@ const defaultIcon = L.icon({
 // PDOK BRT Achtergrondkaart (web mercator), free to use, no API key required
 const PDOK_URL =
   'https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:3857/{z}/{x}/{y}.png'
-const PDOK_ATTRIBUTION =
-  'Kaartgegevens &copy; <a href="https://www.kadaster.nl">Kadaster</a> | <a href="https://www.pdok.nl">PDOK</a> | Hoogte: <a href="https://www.ahn.nl">AHN</a>'
-
 // PDOK AHN (Actueel Hoogtebestand Nederland) WMS — 0,5 m resolutie hoogteraster
 const AHN_WMS_URL = 'https://service.pdok.nl/rws/ahn/wms/v1_0'
 
@@ -81,12 +79,12 @@ async function fetchHeight(map: LeafletMap, latlng: LatLng, layer: string): Prom
   return Number.isFinite(height) ? height : null
 }
 
-function formatHeight(h: number | null | undefined): string {
-  return h == null ? 'geen data' : `${h.toFixed(2)} m NAP`
+function formatHeight(h: number | null | undefined, noDataLabel: string): string {
+  return h == null ? noDataLabel : `${h.toFixed(2)} m NAP`
 }
 
 /** Click anywhere on the map to query the AHN elevation at that point. */
-function HeightProbe() {
+function HeightProbe({ language }: { language: Language }) {
   const [result, setResult] = useState<HeightResult | null>(null)
   const map = useMapEvents({
     click(e) {
@@ -101,24 +99,26 @@ function HeightProbe() {
   })
 
   if (!result) return null
+  const t = translations[language]
+
   return (
     <Popup position={result.position}>
       {result.loading ? (
-        'Hoogte opvragen…'
+        t.queryingElevation
       ) : result.error ? (
-        'Hoogte opvragen mislukt.'
+        t.elevationQueryError
       ) : (
         <div className="height-popup">
-          <strong>Hoogte (AHN)</strong>
+          <strong>{t.elevationTitle}</strong>
           <table>
             <tbody>
               <tr>
-                <td>Maaiveld (DTM)</td>
-                <td>{formatHeight(result.dtm)}</td>
+                <td>{t.groundSurface}</td>
+                <td>{formatHeight(result.dtm, t.noData)}</td>
               </tr>
               <tr>
-                <td>Oppervlak (DSM)</td>
-                <td>{formatHeight(result.dsm)}</td>
+                <td>{t.surface}</td>
+                <td>{formatHeight(result.dsm, t.noData)}</td>
               </tr>
             </tbody>
           </table>
@@ -129,12 +129,21 @@ function HeightProbe() {
 }
 
 interface PdokMapProps {
+  language: Language
   floodEnabled: boolean
   floodLevel: number
   onFloodStatusChange?: (status: FloodStatus) => void
 }
 
-export default function PdokMap({ floodEnabled, floodLevel, onFloodStatusChange }: PdokMapProps) {
+export default function PdokMap({
+  language,
+  floodEnabled,
+  floodLevel,
+  onFloodStatusChange,
+}: PdokMapProps) {
+  const t = translations[language]
+  const attribution = `${t.mapAttribution} &copy; <a href="https://www.kadaster.nl">Kadaster</a> | <a href="https://www.pdok.nl">PDOK</a> | ${t.elevationAttribution}: <a href="https://www.ahn.nl">AHN</a>`
+
   return (
     <MapContainer
       center={HAARSTEEG}
@@ -143,9 +152,9 @@ export default function PdokMap({ floodEnabled, floodLevel, onFloodStatusChange 
       maxZoom={19}
       className="pdok-map"
     >
-      <TileLayer url={PDOK_URL} attribution={PDOK_ATTRIBUTION} />
-      <LayersControl position="topright">
-        <LayersControl.Overlay checked name="Hoogte — oppervlak (AHN DSM)">
+      <TileLayer url={PDOK_URL} attribution={attribution} />
+      <LayersControl key={language} position="topright">
+        <LayersControl.Overlay checked name={t.elevationOverlay}>
           <WMSTileLayer
             url={AHN_WMS_URL}
             params={{ layers: 'dsm_05m', format: 'image/png', transparent: true }}
@@ -154,7 +163,7 @@ export default function PdokMap({ floodEnabled, floodLevel, onFloodStatusChange 
           />
         </LayersControl.Overlay>
       </LayersControl>
-      <HeightProbe />
+      <HeightProbe language={language} />
       <FloodLayer
         enabled={floodEnabled}
         level={floodLevel}
@@ -165,7 +174,7 @@ export default function PdokMap({ floodEnabled, floodLevel, onFloodStatusChange 
           <Popup>
             <strong>{loc.name}</strong>
             <br />
-            {loc.description}
+            {t.locationDescriptions[loc.id] ?? loc.description}
           </Popup>
         </Marker>
       ))}
