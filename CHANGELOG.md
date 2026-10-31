@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/prombouts/waterpeil/compare/doorbraakkaart-v1.3.0...doorbraakkaart-v1.4.0) (2026-10-31)
+
+
+### Features
+
+* support flood simulation at all zoom levels ([c89caf3](https://github.com/prombouts/waterpeil/commit/c89caf3200a1b567e029411ba3d9172993c03194))
+
 ## [1.3.0](https://github.com/prombouts/waterpeil/compare/doorbraakkaart-v1.2.0...doorbraakkaart-v1.3.0) (2026-10-31)
 
 
