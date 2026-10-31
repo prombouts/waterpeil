@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import packageJson from '../package.json'
 import PdokMap from './components/PdokMap'
 import FloodControls from './components/FloodControls'
 import type { FloodStatus } from './components/FloodLayer'
@@ -35,7 +36,8 @@ export default function App() {
         Gemaakt door{' '}
         <a href="https://www.peterrombouts.nl/" target="_blank" rel="noopener noreferrer">
           Peter Rombouts
-        </a>
+        </a>{' '}
+        · Versie {packageJson.version}
       </footer>
     </div>
   )

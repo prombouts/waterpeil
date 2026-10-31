@@ -30,14 +30,24 @@ Pas `src/data/locations.ts` aan (of vervang door een fetch naar een API/GeoJSON)
 
 ## Deployen naar Azure Static Web Apps
 
-1. Maak in Azure een **Static Web App** aan (Free tier volstaat) en koppel deze aan je GitHub-repository, of maak hem los aan en gebruik het deployment token.
-2. Zet het deployment token als repo-secret `AZURE_STATIC_WEB_APPS_API_TOKEN`.
-3. De workflow `.github/workflows/azure-static-web-apps.yml` bouwt en deployt automatisch bij een push naar `main`.
-4. Koppel het custom domain **doorbraakkaart.nl** in Azure Portal: Static Web App → *Custom domains* → *Add*, en zet bij je registrar de gevraagde DNS-records (CNAME voor `www`, TXT + ALIAS/A voor de apex).
+Maak de resource group en de Free-tier Static Web App aan vanuit de repository-root:
 
-Build-instellingen (als Azure ernaar vraagt): app location `/`, output location `dist`.
+```powershell
+az deployment sub create --location westeurope --template-file infra/main.bicep --parameters resourceGroupName=rg-doorbraakkaart-prod staticWebAppName=doorbraakkaart-prombouts
+```
 
-`public/staticwebapp.config.json` bevat de SPA-fallback-configuratie.
+Bouw en publiceer daarna de statische bestanden met de deployment token van de app:
+
+```powershell
+npm ci
+npm run build
+$token = az staticwebapp secrets list --name doorbraakkaart-prombouts --resource-group rg-doorbraakkaart-prod --query properties.apiKey --output tsv
+npx --yes @azure/static-web-apps-cli deploy ./dist --deployment-token $token --env production
+Remove-Variable token
+```
+
+Release Please beheert de SemVer-versies vanuit Conventional Commits: `fix:` verhoogt de patch, `feat:` de minor en een breaking change (bijvoorbeeld `feat!:`) de major. De footer toont de versie uit `package.json`. Release Please maakt of actualiseert een release-PR na commits op `main`; na het mergen maakt het een GitHub Release. Alleen wanneer een nieuwe release is aangemaakt, bouwt en publiceert `.github/workflows/azure-static-web-apps.yml` de app naar Azure. Een gewone push of het bijwerken van een release-PR deployt dus niet. Hiervoor moet de GitHub repository-secret `AZURE_STATIC_WEB_APPS_API_TOKEN` de deployment token van de Static Web App bevatten. `public/staticwebapp.config.json` bevat de SPA-fallback-configuratie. Koppel eventueel het custom domain **doorbraakkaart.nl** in Azure Portal → Static Web App → *Custom domains* → *Add*, en stel bij de registrar de gevraagde DNS-records in (CNAME voor `www`, TXT + ALIAS/A voor de apex).
+
 
 ## Auteur
 
