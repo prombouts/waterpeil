@@ -1,0 +1,121 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.app-header {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.6rem 1rem;
+  background: #154273; /* Rijksoverheid blue */
+  color: #fff;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.app-header .subtitle {
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+.app-main {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+.flood-panel {
+  position: absolute;
+  top: 12px;
+  left: 56px;
+  z-index: 1100;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
+  padding: 0.6rem 0.8rem;
+  font-size: 0.85rem;
+  max-width: 260px;
+}
+
+.flood-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+}
+
+.flood-level {
+  display: block;
+  margin-top: 0.5rem;
+}
+
+.flood-level input[type='range'] {
+  width: 100%;
+  margin-top: 0.3rem;
+}
+
+.flood-status {
+  margin-top: 0.4rem;
+  min-height: 1.2em;
+  color: #333;
+}
+
+.flood-hint {
+  color: #666;
+  font-size: 0.75rem;
+}
+
+.app-footer {
+  padding: 0.35rem 1rem;
+  background: #154273;
+  color: #fff;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.app-footer a {
+  color: #fff;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.app-footer a:hover,
+.app-footer a:focus-visible {
+  color: #cce0f5;
+}
+
+.pdok-map {
+  height: 100%;
+  width: 100%;
+}
+
+.height-popup table {
+  margin-top: 0.3rem;
+  border-collapse: collapse;
+}
+
+.height-popup td {
+  padding: 0.1rem 0.4rem 0.1rem 0;
+}
+
+.height-popup td:last-child {
+  font-weight: 600;
+  text-align: right;
+}

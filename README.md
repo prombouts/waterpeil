@@ -1,6 +1,6 @@
-# Waterpeil
+# Doorbraakkaart
 
-React web app die Nederland visualiseert op de [PDOK](https://www.pdok.nl) **BRT Achtergrondkaart** (Kadaster), met AHN-hoogte-informatie en een dijkdoorbraak-simulatie: kies een waterpeil en zie welk land onder water komt te staan. Wat er verder op de kaart komt is nog te bepalen — er staan nu voorbeeldmarkers (landmarks) in `src/data/locations.ts`.
+**[doorbraakkaart.nl](https://doorbraakkaart.nl)** — React web app die Nederland visualiseert op de [PDOK](https://www.pdok.nl) **BRT Achtergrondkaart** (Kadaster), met AHN-hoogte-informatie en een dijkdoorbraak-simulatie: kies een waterpeil en zie welk land onder water komt te staan. Wat er verder op de kaart komt is nog te bepalen — er staan nu voorbeeldmarkers (landmarks) in `src/data/locations.ts`.
 
 ## Stack
 
@@ -10,7 +10,7 @@ React web app die Nederland visualiseert op de [PDOK](https://www.pdok.nl) **BRT
 
 ## Functies
 
-- **Hoogte-informatie (AHN)**: twee schakelbare overlays via het lagenmenu (rechtsboven) — maaiveld (`dtm_05m`) en oppervlak (`dsm_05m`), 0,5 m resolutie. Klik op de kaart om de exacte hoogte (m t.o.v. NAP) op dat punt op te vragen (WMS GetFeatureInfo).
+- **Hoogte-informatie (AHN)**: hoogte-overlay oppervlak (`dsm_05m`, 0,5 m resolutie) standaard ingeschakeld; schakelbaar via het lagenmenu (rechtsboven). Klik op de kaart om de exacte hoogte (m t.o.v. NAP) op dat punt op te vragen (WMS GetFeatureInfo, zowel maaiveld als oppervlak).
 - **Dijkdoorbraak-simulatie**: kies een waterpeil (in stappen van 0,5 m, −2 t/m +10 m NAP) en zie welk land onder water komt te staan. De app haalt ruwe AHN-maaiveldhoogtes voor het zichtbare kaartbeeld op via de PDOK **WCS** (GeoTIFF, gedecodeerd met geotiff.js) en kleurt alle pixels onder het gekozen peil blauw — donkerder naarmate het water dieper staat. Let op: dit is een vereenvoudigd &ldquo;badkuip&rdquo;-model (geen rekening met waterstromen, dijkringen of gemalen). Zoom minimaal tot niveau 10 in.
 - Startweergave: Haarsteeg, met Waalwijk en 's-Hertogenbosch in beeld.
 - Voorbeeldmarkers in `src/data/locations.ts`.
@@ -33,10 +33,15 @@ Pas `src/data/locations.ts` aan (of vervang door een fetch naar een API/GeoJSON)
 1. Maak in Azure een **Static Web App** aan (Free tier volstaat) en koppel deze aan je GitHub-repository, of maak hem los aan en gebruik het deployment token.
 2. Zet het deployment token als repo-secret `AZURE_STATIC_WEB_APPS_API_TOKEN`.
 3. De workflow `.github/workflows/azure-static-web-apps.yml` bouwt en deployt automatisch bij een push naar `main`.
+4. Koppel het custom domain **doorbraakkaart.nl** in Azure Portal: Static Web App → *Custom domains* → *Add*, en zet bij je registrar de gevraagde DNS-records (CNAME voor `www`, TXT + ALIAS/A voor de apex).
 
 Build-instellingen (als Azure ernaar vraagt): app location `/`, output location `dist`.
 
 `public/staticwebapp.config.json` bevat de SPA-fallback-configuratie.
+
+## Auteur
+
+[Peter Rombouts](https://www.peterrombouts.nl/)
 
 ## Andere PDOK-lagen
 

@@ -1,0 +1,174 @@
+import { useState } from 'react'
+import {
+  MapContainer,
+  TileLayer,
+  WMSTileLayer,
+  LayersControl,
+  Marker,
+  Popup,
+  useMapEvents,
+} from 'react-leaflet'
+import L, { type LatLng, type Map as LeafletMap } from 'leaflet'
+import 'leaflet/dist/leaflet.css'
+import markerIcon from 'leaflet/dist/images/marker-icon.png'
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
+import markerShadow from 'leaflet/dist/images/marker-shadow.png'
+import { locations } from '../data/locations'
+import FloodLayer, { type FloodStatus } from './FloodLayer'
+
+// Fix default marker icons under bundlers (Vite)
+const defaultIcon = L.icon({
+  iconUrl: markerIcon,
+  iconRetinaUrl: markerIcon2x,
+  shadowUrl: markerShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+})
+
+// PDOK BRT Achtergrondkaart (web mercator), free to use, no API key required
+const PDOK_URL =
+  'https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:3857/{z}/{x}/{y}.png'
+const PDOK_ATTRIBUTION =
+  'Kaartgegevens &copy; <a href="https://www.kadaster.nl">Kadaster</a> | <a href="https://www.pdok.nl">PDOK</a> | Hoogte: <a href="https://www.ahn.nl">AHN</a>'
+
+// PDOK AHN (Actueel Hoogtebestand Nederland) WMS — 0,5 m resolutie hoogteraster
+const AHN_WMS_URL = 'https://service.pdok.nl/rws/ahn/wms/v1_0'
+
+// Haarsteeg — startweergave; zoom 12 houdt Waalwijk én Den Bosch in beeld
+const HAARSTEEG: [number, number] = [51.7114, 5.1972]
+
+interface HeightResult {
+  position: LatLng
+  loading: boolean
+  dtm?: number | null // maaiveld (terrein)
+  dsm?: number | null // oppervlakte (incl. gebouwen/bomen)
+  error?: boolean
+}
+
+function buildGetFeatureInfoUrl(map: LeafletMap, latlng: LatLng, layer: string): string {
+  const size = map.getSize()
+  const bounds = map.getBounds()
+  const sw = L.CRS.EPSG3857.project(bounds.getSouthWest())
+  const ne = L.CRS.EPSG3857.project(bounds.getNorthEast())
+  const point = map.latLngToContainerPoint(latlng).round()
+  const params = new URLSearchParams({
+    SERVICE: 'WMS',
+    VERSION: '1.3.0',
+    REQUEST: 'GetFeatureInfo',
+    LAYERS: layer,
+    QUERY_LAYERS: layer,
+    STYLES: '',
+    FORMAT: 'image/png',
+    INFO_FORMAT: 'application/json',
+    CRS: 'EPSG:3857',
+    BBOX: `${sw.x},${sw.y},${ne.x},${ne.y}`,
+    WIDTH: String(size.x),
+    HEIGHT: String(size.y),
+    I: String(point.x),
+    J: String(point.y),
+  })
+  return `${AHN_WMS_URL}?${params}`
+}
+
+async function fetchHeight(map: LeafletMap, latlng: LatLng, layer: string): Promise<number | null> {
+  const res = await fetch(buildGetFeatureInfoUrl(map, latlng, layer))
+  if (!res.ok) throw new Error(`AHN request failed: ${res.status}`)
+  const json = await res.json()
+  const value = json?.features?.[0]?.properties?.value_list
+  const height = Number.parseFloat(value)
+  return Number.isFinite(height) ? height : null
+}
+
+function formatHeight(h: number | null | undefined): string {
+  return h == null ? 'geen data' : `${h.toFixed(2)} m NAP`
+}
+
+/** Click anywhere on the map to query the AHN elevation at that point. */
+function HeightProbe() {
+  const [result, setResult] = useState<HeightResult | null>(null)
+  const map = useMapEvents({
+    click(e) {
+      setResult({ position: e.latlng, loading: true })
+      Promise.all([
+        fetchHeight(map, e.latlng, 'dtm_05m'),
+        fetchHeight(map, e.latlng, 'dsm_05m'),
+      ])
+        .then(([dtm, dsm]) => setResult({ position: e.latlng, loading: false, dtm, dsm }))
+        .catch(() => setResult({ position: e.latlng, loading: false, error: true }))
+    },
+  })
+
+  if (!result) return null
+  return (
+    <Popup position={result.position}>
+      {result.loading ? (
+        'Hoogte opvragen…'
+      ) : result.error ? (
+        'Hoogte opvragen mislukt.'
+      ) : (
+        <div className="height-popup">
+          <strong>Hoogte (AHN)</strong>
+          <table>
+            <tbody>
+              <tr>
+                <td>Maaiveld (DTM)</td>
+                <td>{formatHeight(result.dtm)}</td>
+              </tr>
+              <tr>
+                <td>Oppervlak (DSM)</td>
+                <td>{formatHeight(result.dsm)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      )}
+    </Popup>
+  )
+}
+
+interface PdokMapProps {
+  floodEnabled: boolean
+  floodLevel: number
+  onFloodStatusChange?: (status: FloodStatus) => void
+}
+
+export default function PdokMap({ floodEnabled, floodLevel, onFloodStatusChange }: PdokMapProps) {
+  return (
+    <MapContainer
+      center={HAARSTEEG}
+      zoom={12}
+      minZoom={6}
+      maxZoom={19}
+      className="pdok-map"
+    >
+      <TileLayer url={PDOK_URL} attribution={PDOK_ATTRIBUTION} />
+      <LayersControl position="topright">
+        <LayersControl.Overlay checked name="Hoogte — oppervlak (AHN DSM)">
+          <WMSTileLayer
+            url={AHN_WMS_URL}
+            params={{ layers: 'dsm_05m', format: 'image/png', transparent: true }}
+            opacity={0.55}
+            maxZoom={19}
+          />
+        </LayersControl.Overlay>
+      </LayersControl>
+      <HeightProbe />
+      <FloodLayer
+        enabled={floodEnabled}
+        level={floodLevel}
+        onStatusChange={onFloodStatusChange}
+      />
+      {locations.map((loc) => (
+        <Marker key={loc.id} position={loc.position} icon={defaultIcon}>
+          <Popup>
+            <strong>{loc.name}</strong>
+            <br />
+            {loc.description}
+          </Popup>
+        </Marker>
+      ))}
+    </MapContainer>
+  )
+}
