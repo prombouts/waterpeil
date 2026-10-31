@@ -14,6 +14,8 @@ interface AppTranslations {
   floodHint: string
   mapAttribution: string
   elevationAttribution: string
+  standardMap: string
+  aerialPhoto: string
   elevationOverlay: string
   queryingElevation: string
   elevationQueryError: string
@@ -21,7 +23,7 @@ interface AppTranslations {
   noData: string
   groundSurface: string
   surface: string
-  madeBy: string
+  version: string
   locationDescriptions: Record<string, string>
 }
 
@@ -42,6 +44,8 @@ export const translations: Record<Language, AppTranslations> = {
       'Blauw = land onder het gekozen waterpeil (vereenvoudigd “badkuip”-model op basis van AHN-maaiveldhoogte).',
     mapAttribution: 'Kaartgegevens',
     elevationAttribution: 'Hoogte',
+    standardMap: 'Standaardkaart',
+    aerialPhoto: 'Luchtfoto',
     elevationOverlay: 'Hoogte — oppervlak (AHN DSM)',
     queryingElevation: 'Hoogte opvragen…',
     elevationQueryError: 'Hoogte opvragen mislukt.',
@@ -49,7 +53,7 @@ export const translations: Record<Language, AppTranslations> = {
     noData: 'geen data',
     groundSurface: 'Maaiveld (DTM)',
     surface: 'Oppervlak (DSM)',
-    madeBy: 'Gemaakt door',
+    version: 'Versie',
     locationDescriptions: {
       dam: 'Centraal plein van Amsterdam.',
       domtoren: 'Hoogste kerktoren van Nederland.',
@@ -74,6 +78,8 @@ export const translations: Record<Language, AppTranslations> = {
       'Blue = land below the selected water level (simplified “bathtub” model based on AHN ground elevation).',
     mapAttribution: 'Map data',
     elevationAttribution: 'Elevation',
+    standardMap: 'Standard map',
+    aerialPhoto: 'Aerial photo',
     elevationOverlay: 'Elevation — surface (AHN DSM)',
     queryingElevation: 'Loading elevation…',
     elevationQueryError: 'Failed to load elevation.',
@@ -81,7 +87,7 @@ export const translations: Record<Language, AppTranslations> = {
     noData: 'no data',
     groundSurface: 'Ground (DTM)',
     surface: 'Surface (DSM)',
-    madeBy: 'Made by',
+    version: 'Version',
     locationDescriptions: {
       dam: 'Central square of Amsterdam.',
       domtoren: 'The tallest church tower in the Netherlands.',

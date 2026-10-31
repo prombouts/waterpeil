@@ -31,6 +31,8 @@ const defaultIcon = L.icon({
 // PDOK BRT Achtergrondkaart (web mercator), free to use, no API key required
 const PDOK_URL =
   'https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:3857/{z}/{x}/{y}.png'
+const AERIAL_PHOTO_URL =
+  'https://service.pdok.nl/hwh/luchtfotorgb/wmts/v1_0/Actueel_ortho25/EPSG:3857/{z}/{x}/{y}.jpeg'
 // PDOK AHN (Actueel Hoogtebestand Nederland) WMS — 0,5 m resolutie hoogteraster
 const AHN_WMS_URL = 'https://service.pdok.nl/rws/ahn/wms/v1_0'
 
@@ -135,14 +137,42 @@ interface PdokMapProps {
   onFloodStatusChange?: (status: FloodStatus) => void
 }
 
+type BaseMap = 'standard' | 'aerial'
+
+function MapLayerChangeListener({
+  language,
+  onBaseMapChange,
+  onElevationChange,
+}: {
+  language: Language
+  onBaseMapChange: (baseMap: BaseMap) => void
+  onElevationChange: (visible: boolean) => void
+}) {
+  useMapEvents({
+    baselayerchange(event) {
+      onBaseMapChange(event.name === translations[language].aerialPhoto ? 'aerial' : 'standard')
+    },
+    overlayadd(event) {
+      if (event.name === translations[language].elevationOverlay) onElevationChange(true)
+    },
+    overlayremove(event) {
+      if (event.name === translations[language].elevationOverlay) onElevationChange(false)
+    },
+  })
+  return null
+}
+
 export default function PdokMap({
   language,
   floodEnabled,
   floodLevel,
   onFloodStatusChange,
 }: PdokMapProps) {
+  const [baseMap, setBaseMap] = useState<BaseMap>('standard')
+  const [elevationVisible, setElevationVisible] = useState(false)
   const t = translations[language]
-  const attribution = `${t.mapAttribution} &copy; <a href="https://www.kadaster.nl">Kadaster</a> | <a href="https://www.pdok.nl">PDOK</a> | ${t.elevationAttribution}: <a href="https://www.ahn.nl">AHN</a>`
+  const mapAttribution = `${t.mapAttribution} &copy; <a href="https://www.kadaster.nl">Kadaster</a> | <a href="https://www.pdok.nl">PDOK</a>`
+  const elevationAttribution = `${t.elevationAttribution}: <a href="https://www.ahn.nl">AHN</a>`
 
   return (
     <MapContainer
@@ -152,17 +182,28 @@ export default function PdokMap({
       maxZoom={19}
       className="pdok-map"
     >
-      <TileLayer url={PDOK_URL} attribution={attribution} />
       <LayersControl key={language} position="topright">
-        <LayersControl.Overlay checked name={t.elevationOverlay}>
+        <LayersControl.BaseLayer checked={baseMap === 'standard'} name={t.standardMap}>
+          <TileLayer url={PDOK_URL} attribution={mapAttribution} />
+        </LayersControl.BaseLayer>
+        <LayersControl.BaseLayer checked={baseMap === 'aerial'} name={t.aerialPhoto}>
+          <TileLayer url={AERIAL_PHOTO_URL} attribution={mapAttribution} />
+        </LayersControl.BaseLayer>
+        <LayersControl.Overlay checked={elevationVisible} name={t.elevationOverlay}>
           <WMSTileLayer
             url={AHN_WMS_URL}
             params={{ layers: 'dsm_05m', format: 'image/png', transparent: true }}
             opacity={0.55}
             maxZoom={19}
+            attribution={elevationAttribution}
           />
         </LayersControl.Overlay>
       </LayersControl>
+      <MapLayerChangeListener
+        language={language}
+        onBaseMapChange={setBaseMap}
+        onElevationChange={setElevationVisible}
+      />
       <HeightProbe language={language} />
       <FloodLayer
         enabled={floodEnabled}

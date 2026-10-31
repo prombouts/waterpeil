@@ -55,8 +55,7 @@ Release Please beheert de SemVer-versies vanuit Conventional Commits: `fix:` ver
 
 ## Andere PDOK-lagen
 
-PDOK biedt meer lagen (luchtfoto, BGT, grijze/pastel varianten). Vervang de tile-URL in `PdokMap.tsx`, bijv.:
+De luchtfoto is beschikbaar als basislaag via het lagenmenu op de kaart. Andere PDOK-lagen (zoals BGT en grijs/pastel varianten) kun je toevoegen door de tile-URL in `PdokMap.tsx` te vervangen, bijv.:
 
 - Grijs: `.../wmts/v2_0/grijs/EPSG:3857/{z}/{x}/{y}.png`
 - Pastel: `.../wmts/v2_0/pastel/EPSG:3857/{z}/{x}/{y}.png`
-- Luchtfoto: `https://service.pdok.nl/hwh/luchtfotorgb/wmts/v1_0/Actueel_ortho25/EPSG:3857/{z}/{x}/{y}.jpeg`

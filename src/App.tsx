@@ -5,6 +5,28 @@ import FloodControls from './components/FloodControls'
 import type { FloodStatus } from './components/FloodLayer'
 import { translations, type Language } from './translations'
 
+function LanguageFlag({ language }: { language: Language }) {
+  if (language === 'nl') {
+    return (
+      <svg className="language-flag" viewBox="0 0 30 20" aria-hidden="true">
+        <rect width="30" height="20" fill="#21468b" />
+        <rect width="30" height="6.67" fill="#ae1c28" />
+        <rect y="6.67" width="30" height="6.66" fill="#fff" />
+      </svg>
+    )
+  }
+
+  return (
+    <svg className="language-flag" viewBox="0 0 60 30" aria-hidden="true">
+      <rect width="60" height="30" fill="#012169" />
+      <path d="M0 0 60 30M60 0 0 30" stroke="#fff" strokeWidth="6" />
+      <path d="M0 0 60 30M60 0 0 30" stroke="#c8102e" strokeWidth="2" />
+      <path d="M30 0v30M0 15h60" stroke="#fff" strokeWidth="10" />
+      <path d="M30 0v30M0 15h60" stroke="#c8102e" strokeWidth="6" />
+    </svg>
+  )
+}
+
 export default function App() {
   const [language, setLanguage] = useState<Language>('nl')
   const [floodEnabled, setFloodEnabled] = useState(false)
@@ -29,21 +51,21 @@ export default function App() {
             type="button"
             className={`language-button${language === 'nl' ? ' is-active' : ''}`}
             aria-label={t.dutchLanguage}
+            title={t.dutchLanguage}
             aria-pressed={language === 'nl'}
             onClick={() => setLanguage('nl')}
           >
-            <span aria-hidden="true">🇳🇱</span>
-            <span>NL</span>
+            <LanguageFlag language="nl" />
           </button>
           <button
             type="button"
             className={`language-button${language === 'en' ? ' is-active' : ''}`}
             aria-label={t.englishLanguage}
+            title={t.englishLanguage}
             aria-pressed={language === 'en'}
             onClick={() => setLanguage('en')}
           >
-            <span aria-hidden="true">🇬🇧</span>
-            <span>EN</span>
+            <LanguageFlag language="en" />
           </button>
         </div>
       </header>
@@ -64,11 +86,10 @@ export default function App() {
         />
       </main>
       <footer className="app-footer">
-        {t.madeBy}{' '}
         <a href="https://www.peterrombouts.nl/" target="_blank" rel="noopener noreferrer">
           Peter Rombouts
         </a>{' '}
-        · Versie {packageJson.version}
+        · {t.version} {packageJson.version}
       </footer>
     </div>
   )
