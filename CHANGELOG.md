@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/prombouts/waterpeil/compare/doorbraakkaart-v1.2.0...doorbraakkaart-v1.3.0) (2026-10-31)
+
+
+### Features
+
+* improve map layers and language controls ([544a1b7](https://github.com/prombouts/waterpeil/commit/544a1b77ef3d8ec1a708ffe1724e5103388c5232))
+
 ## [1.2.0](https://github.com/prombouts/waterpeil/compare/doorbraakkaart-v1.1.0...doorbraakkaart-v1.2.0) (2026-10-31)
 
 
