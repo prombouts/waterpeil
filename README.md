@@ -11,7 +11,7 @@
 ## Functies
 
 - **Hoogte-informatie (AHN)**: hoogte-overlay oppervlak (`dsm_05m`, 0,5 m resolutie) standaard ingeschakeld; schakelbaar via het lagenmenu (rechtsboven). Klik op de kaart om de exacte hoogte (m t.o.v. NAP) op dat punt op te vragen (WMS GetFeatureInfo, zowel maaiveld als oppervlak).
-- **Dijkdoorbraak-simulatie**: kies een waterpeil (in stappen van 0,5 m, −2 t/m +10 m NAP) en zie welk land onder water komt te staan. De app haalt ruwe AHN-maaiveldhoogtes voor het zichtbare kaartbeeld op via de PDOK **WCS** (GeoTIFF, gedecodeerd met geotiff.js) en kleurt alle pixels onder het gekozen peil blauw — donkerder naarmate het water dieper staat. Let op: dit is een vereenvoudigd &ldquo;badkuip&rdquo;-model (geen rekening met waterstromen, dijkringen of gemalen). Zoom minimaal tot niveau 10 in.
+- **Dijkdoorbraak-simulatie**: kies een waterpeil (in stappen van 0,5 m, −2 t/m +10 m NAP) en zie welk land onder water komt te staan. De app haalt ruwe AHN-maaiveldhoogtes voor het zichtbare kaartbeeld op via de PDOK **WCS** (GeoTIFF, gedecodeerd met geotiff.js) en kleurt alle pixels onder het gekozen peil blauw — donkerder naarmate het water dieper staat. De simulatie werkt op alle beschikbare zoomniveaus (6 t/m 19). Let op: dit is een vereenvoudigd &ldquo;badkuip&rdquo;-model (geen rekening met waterstromen, dijkringen of gemalen).
 - Startweergave: Haarsteeg, met Waalwijk en 's-Hertogenbosch in beeld.
 - Voorbeeldmarkers in `src/data/locations.ts`.
 

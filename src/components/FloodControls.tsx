@@ -54,7 +54,6 @@ export default function FloodControls({
           <div className="flood-status">
             {status === 'loading' && t.loadingElevation}
             {status === 'error' && t.elevationError}
-            {status === 'zoom-out' && t.zoomInHint}
             {status === 'idle' && (
               <span className="flood-hint">{t.floodHint}</span>
             )}

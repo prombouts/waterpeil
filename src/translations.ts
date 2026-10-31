@@ -10,7 +10,6 @@ interface AppTranslations {
   waterLevel: string
   loadingElevation: string
   elevationError: string
-  zoomInHint: string
   floodHint: string
   mapAttribution: string
   elevationAttribution: string
@@ -39,7 +38,6 @@ export const translations: Record<Language, AppTranslations> = {
     waterLevel: 'Waterpeil:',
     loadingElevation: 'Hoogtedata laden…',
     elevationError: 'Laden van hoogtedata mislukt.',
-    zoomInHint: 'Zoom verder in om de simulatie te zien.',
     floodHint:
       'Blauw = land onder het gekozen waterpeil (vereenvoudigd “badkuip”-model op basis van AHN-maaiveldhoogte).',
     mapAttribution: 'Kaartgegevens',
@@ -73,7 +71,6 @@ export const translations: Record<Language, AppTranslations> = {
     waterLevel: 'Water level:',
     loadingElevation: 'Loading elevation data…',
     elevationError: 'Failed to load elevation data.',
-    zoomInHint: 'Zoom in further to see the simulation.',
     floodHint:
       'Blue = land below the selected water level (simplified “bathtub” model based on AHN ground elevation).',
     mapAttribution: 'Map data',

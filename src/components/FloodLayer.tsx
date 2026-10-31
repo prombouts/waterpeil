@@ -5,10 +5,9 @@ import { fromArrayBuffer } from 'geotiff'
 
 const AHN_WCS_URL = 'https://service.pdok.nl/rws/ahn/wcs/v1_0'
 const EPSG3857 = 'http://www.opengis.net/def/crs/EPSG/0/3857'
-const MIN_FLOOD_ZOOM = 10
 const MAX_RASTER_SIZE = 512
 
-export type FloodStatus = 'idle' | 'loading' | 'error' | 'zoom-out'
+export type FloodStatus = 'idle' | 'loading' | 'error'
 
 interface RasterCache {
   key: string
@@ -135,13 +134,6 @@ export default function FloodLayer({ enabled, level, onStatusChange }: FloodLaye
     }
 
     const update = async () => {
-      if (map.getZoom() < MIN_FLOOD_ZOOM) {
-        removeOverlay()
-        cacheRef.current = null
-        setStatus('zoom-out')
-        return
-      }
-
       const bounds = map.getBounds()
       const sw = L.CRS.EPSG3857.project(bounds.getSouthWest())
       const ne = L.CRS.EPSG3857.project(bounds.getNorthEast())
